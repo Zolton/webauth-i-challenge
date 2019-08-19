@@ -1,7 +1,19 @@
-const db = require("../db-Config")
+const db = require("../db-Config");
+const bcrypt = require("bcryptjs");
 
-module.exports = {getAll}
+module.exports = { getAllUsers, addNewUser, addHash };
 
-function getAll (req, res) {
-    return res.status(200).json({Hello: "From db helper funtions"})
+function getAllUsers() {
+  return db("users");
+}
+
+function addNewUser(newUser) {
+  return db("users").insert(newUser);
+}
+
+function addHash(req, res, next) {
+  const user = req.body;
+  const hash = bcrypt.hashSync(user.password);
+  user.password = hash;
+  next()
 }

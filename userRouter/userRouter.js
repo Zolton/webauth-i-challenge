@@ -1,13 +1,30 @@
-const express = require("express")
-const router = express.Router()
-const User = require("../helperFunctions/db-helperFunctions")
+const express = require("express");
+const router = express.Router();
+const User = require("../helperFunctions/db-helperFunctions");
 
-router.get("/users", (req, res)=>{
+router.get("/", (req, res) => {
+  res.status(200).json({ Hello: "From userRouter" });
+});
 
-    User.getAll().then(user=>{
-        res.status(200).json({Hello: "From userRouter.js"})
+router.get("/users", (req, res) => {
+  User.getAllUsers()
+    .then(users => {
+      res.status(200).json(users);
     })
-}
-)
+    .catch(error => {
+      res.status(500).json({ Error: "Server status: 500" });
+    });
+});
 
-module.exports = router
+router.post("/register", User.addHash, (req, res) => {
+  const newUser = req.body;
+  User.addNewUser(newUser)
+    .then(newU => {
+      res.status(200).json(newU);
+    })
+    .catch(error => {
+      res.status(500).json({ Error: "Server status: 500" });
+    });
+});
+
+module.exports = router;
