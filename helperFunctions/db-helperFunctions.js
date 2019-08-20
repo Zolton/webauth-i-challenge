@@ -32,7 +32,7 @@ function validator(req, res, next) {
       })
       .catch(error => {
         res.status(500).json(error);
-      })
+      });
   } else {
     res.status(400).json({ Error: "Please enter a username and password" });
   }
