@@ -1,7 +1,13 @@
 const db = require("../db-Config");
 const bcrypt = require("bcryptjs");
 
-module.exports = { getAllUsers, addNewUser, addHash, validator };
+module.exports = {
+  getAllUsers,
+  addNewUser,
+  addHash,
+  getUser,
+  restricted
+};
 
 function getAllUsers() {
   return db("users");
@@ -18,26 +24,14 @@ function addHash(req, res, next) {
   next();
 }
 
-function validator(req, res, next) {
-  const { username, password } = req.headers;
-  if (username && password) {
-    getUser({ username })
-      .first()
-      .then(user => {
-        if (user && bcrypt.compare(password, user.password)) {
-          next();
-        } else {
-          res.status(401).json({ Error: "invalid credentials" });
-        }
-      })
-      .catch(error => {
-        res.status(500).json(error);
-      })
-  } else {
-    res.status(400).json({ Error: "Please enter a username and password" });
-  }
-}
-
 function getUser(user) {
   return db("users").where(user);
+}
+
+function restricted(req, res, next) {
+  if (req.session && req.session.gabba) {
+    next();
+  } else {
+    res.status(401).json({ Error: "invalid session settings" });
+  }
 }
